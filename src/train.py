@@ -1,4 +1,6 @@
 import argparse
+import numpy as np
+from Model import MLP
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a Multilayer Perceptron")
@@ -18,6 +20,6 @@ def parse_args():
 # Example use
 if __name__ == "__main__":
     args = parse_args()
-    print("Layer sizes:", args.layer)
-    print("learning_rate:", args.learning_rate)
-    print("epoch:", args.epochs)
+    
+    model = MLP();
+    model.train(np.array([1, 2, 3]), np.array([1, 2, 3]));
