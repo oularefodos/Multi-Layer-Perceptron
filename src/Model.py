@@ -32,7 +32,7 @@ class MLP():
     def farward(self, X, y):
         input_arr = X
         for i in range(len(self.weights)):
-            result = input_arr.T.dot(self.weights[i]) + self.bias[i]
+            result = input_arr.dot(self.weights[i].T) + self.bias[i]
             z = self.ReLU(result)
             input_arr = z
         print(input_arr)

@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 from Model import MLP
+from helpers import load_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a Multilayer Perceptron")
@@ -20,6 +21,11 @@ def parse_args():
 # Example use
 if __name__ == "__main__":
     args = parse_args()
+
+    X, y = load_dataset('data/train.csv')
+
+    # Encode y ('M'->1, 'B'->0)
+    y = y.map({'M': 1, 'B': 0})
     
     model = MLP();
-    model.train(np.array([1, 2, 3]), np.array([1, 2, 3]));
+    model.train(X, y);
