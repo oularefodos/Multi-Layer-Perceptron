@@ -10,14 +10,14 @@ class MLP():
         self.weights = []
         self.bias = []
     
-    def weight_initializer(self, n_input, n_output):
-        return np.random.randn(n_output, n_input) * 0.5
+    def ReLU(self, x):
+        return np.maximum(0, x)
+
+    def solfmax(self, x):
+        return np.exp(x - np.max(x)) / np.sum(np.exp(x - np.max(x)))
     
-    def ReLU(Z):
-        return np.maximum(0, Z)
-    
-    def sigmoid(Z):
-        return 1 / (1 + np.exp(-Z))
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
     
     def bias_initializer(self, n_output):
         return np.zeros((n_output, 1))
@@ -30,12 +30,13 @@ class MLP():
             self.bias.append(b)
     
     def farward(self, X, y):
-        input_arr = X
+        input_arr = X.T
+        z = None
         for i in range(len(self.weights)):
-            result = input_arr.dot(self.weights[i].T) + self.bias[i]
-            z = self.ReLU(result)
+            result = np.sum(self.weights[i].dot(input_arr)) + self.bias[i]
+            z = self.sigmoid(result)
             input_arr = z
-        print(input_arr)
+        print(z)
 
     def train(self, X, y):
         self.initiaze_parms();
