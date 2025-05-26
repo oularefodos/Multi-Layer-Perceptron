@@ -34,6 +34,12 @@ class MLP():
             self.weights.append(w)
             self.bias.append(b)
     
+    def categorical_cross_entropy(y_true, y_pred):
+        epsilon = 1e-8
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        loss = -np.sum(y_true * np.log(y_pred), axis=1)
+        return np.mean(loss)
+    
     def forward(self, X):
         A = X
         activations = [A]
@@ -59,3 +65,5 @@ class MLP():
                 Y_batched = Y[start:end]
 
                 activations, pre_activations = self.forward(X_batched)
+                print(activations[-1])
+                break;
