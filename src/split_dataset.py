@@ -19,7 +19,7 @@ columns = [
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("dataset_path", help="dataset_path needs be a string")
+    parser.add_argument("--dataset_path", help="dataset_path needs be a string")
     args = parser.parse_args()
     
     try:
