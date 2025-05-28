@@ -6,9 +6,8 @@ all: help
 
 # Create virtual environment and install dependencies
 
-env:
-	python3 -m venv $(VENV)
 install:
+	python3 -m venv $(VENV)
 	. $(VENV)/bin/activate && \
 	$(PIP) install --upgrade pip && \
 	$(PIP) install -r requirements.txt

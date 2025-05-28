@@ -1,7 +1,7 @@
 import numpy as np
 
 class MLP():
-    def __init__(self, layers_size=[30, 24, 24, 2], epochs=1, learning_rate=0.01, batch_size=4):
+    def __init__(self, layers_size=[30, 24, 24, 2], epochs=500, learning_rate=0.01, batch_size=4):
         self.layers_size = layers_size;
         self.epochs = epochs;
         self.learning_rate = learning_rate;
@@ -26,6 +26,31 @@ class MLP():
     
     def bias_initializer(self, n_output):
         return np.zeros((1, n_output))
+    
+    def back_propagation(self, activations, pre_activations, Y):
+        grads_w = [None] * len(self.weights)
+        grads_b = [None] * len(self.bias)
+        m = Y.shape[0]
+        # output layer gradient
+        A_final = activations[-1]
+        delta = (A_final - Y) 
+        # gradients for last layer
+        grads_w[-1] = np.dot(activations[-2].T, delta) / m
+        grads_b[-1] = np.sum(delta, axis=0, keepdims=True) / m
+
+        # backprop through hidden layers
+        for l in range(len(self.layers_size)-2, 0, -1):
+            Z = pre_activations[l-1]
+            dA_prev = np.dot(delta, self.weights[l].T)
+            dZ = dA_prev * (activations[l] * (1 - activations[l]))  # sigmoid derivative
+            grads_w[l-1] = np.dot(activations[l-1].T, dZ) / m
+            grads_b[l-1] = np.sum(dZ, axis=0, keepdims=True) / m
+            delta = dZ
+
+        # update parameters
+        for i in range(len(self.weights)):
+            self.weights[i] -= self.learning_rate * grads_w[i]
+            self.bias[i] -= self.learning_rate * grads_b[i]
 
     def initiaze_parms(self):
         for i in range(len(self.layers_size) - 1):
@@ -39,6 +64,10 @@ class MLP():
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
         loss = -np.sum(y_true * np.log(y_pred), axis=1)
         return np.mean(loss)
+
+    def normalize(self, X: np.ndarray):
+        self.mean_, self.std_ = np.mean(X, axis=0), np.std(X, axis=0)
+        return (X - self.mean_) / self.std_
     
     def forward(self, X):
         A = X
@@ -53,9 +82,11 @@ class MLP():
                 A = self.softmax(Z)
             activations.append(A)
         return activations, pre_activations
+        
 
     def train(self, X, Y):
         self.initiaze_parms();
+        X = self.normalize(X);
         n_sample = X.shape[0]
         for _ in range(self.epochs):
             for start in range(0, n_sample, self.batch_size):
@@ -65,6 +96,8 @@ class MLP():
                 Y_batched = Y[start:end]
 
                 activations, pre_activations = self.forward(X_batched)
-                loss = self.compute_cross_entropy_loss(activations[-1], Y_batched)
-                print(loss)
-                break;
+                
+                self.back_propagation(activations, pre_activations, Y_batched);
+                
+            loss = self.compute_cross_entropy_loss(activations[-1], Y_batched)
+            print(loss)
