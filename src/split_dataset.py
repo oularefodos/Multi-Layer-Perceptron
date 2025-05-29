@@ -42,19 +42,19 @@ if __name__ == "__main__":
     split_index_B = int(split_ratio * len(df_B))
     
     train_sample_M = shuffled_df_M[:split_index_M]
-    test_sample_M = shuffled_df_M[split_index_M:]
+    valid_sample_M = shuffled_df_M[split_index_M:]
     
     train_sample_B = shuffled_df_B[:split_index_B]
-    test_sample_B = shuffled_df_B[split_index_B:]
+    valid_sample_B = shuffled_df_B[split_index_B:]
     
     train_df = pd.concat([train_sample_M, train_sample_B], axis=0).reset_index(drop=True)
-    test_df = pd.concat([test_sample_M, test_sample_B], axis=0).reset_index(drop=True)
+    valid_df = pd.concat([valid_sample_M, valid_sample_B], axis=0).reset_index(drop=True)
     
     train_df.to_csv('data/train.csv', sep=',', index=False, encoding='utf-8');
-    test_df.to_csv('data/test.csv', sep=',', index=False, encoding='utf-8');
+    valid_df.to_csv('data/valid.csv', sep=',', index=False, encoding='utf-8');
     
     print("Train class distribution:")
     print(train_df['diagnosis'].value_counts())
-    print("\nTest class distribution:")
-    print(test_df['diagnosis'].value_counts())
+    print("\nvalid class distribution:")
+    print(valid_df['diagnosis'].value_counts())
     

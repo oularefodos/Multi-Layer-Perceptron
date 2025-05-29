@@ -1,12 +1,13 @@
 import numpy as np
 
 class MLP():
-    def __init__(self, layers_size=[30, 24, 24, 2], epochs=500, learning_rate=0.01, batch_size=4):
+    def __init__(self, layers_size=[30, 24, 24, 2], epochs=800, learning_rate=0.01, batch_size=4):
         self.layers_size = layers_size;
         self.epochs = epochs;
         self.learning_rate = learning_rate;
         self.batch_size = batch_size;
-
+        self.loss_history = []
+        self.accuracy_history = []
         self.weights = []
         self.bias = []
     
@@ -82,13 +83,20 @@ class MLP():
                 A = self.softmax(Z)
             activations.append(A)
         return activations, pre_activations
-        
+    
+    def predict(self, X):
+        X = self.normalize(X);
+        activations, _ = self.forward(X);
+        return np.argmax(activations[-1], axis=1);
 
     def train(self, X, Y):
         self.initiaze_parms();
         X = self.normalize(X);
         n_sample = X.shape[0]
-        for _ in range(self.epochs):
+        for epoch in range(self.epochs):
+            correct = 0
+            total = 0
+            epoch_loss = 0
             for start in range(0, n_sample, self.batch_size):
                 
                 end = start + self.batch_size
@@ -99,5 +107,18 @@ class MLP():
                 
                 self.back_propagation(activations, pre_activations, Y_batched);
                 
-            loss = self.compute_cross_entropy_loss(activations[-1], Y_batched)
-            print(loss)
+                y_pred = np.argmax(activations[-1], axis=1)
+                y_true = np.argmax(Y_batched, axis=1)
+                correct += np.sum(y_pred == y_true);
+                
+                total += len(Y_batched)
+                epoch_loss += self.compute_cross_entropy_loss(Y_batched, activations[-1])
+            
+            average_loss = epoch_loss / n_sample
+            self.loss_history.append(average_loss)
+            
+            accuracy = correct / total;
+            self.accuracy_history.append(accuracy);
+
+            if (epoch % 100  == 0):
+                print(f"Epoch: {epoch}, loss: {average_loss}, accuracy: {accuracy}")
