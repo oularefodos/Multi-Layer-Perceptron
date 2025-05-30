@@ -6,8 +6,10 @@ class MLP():
         self.epochs = epochs;
         self.learning_rate = learning_rate;
         self.batch_size = batch_size;
-        self.loss_history = []
-        self.accuracy_history = []
+        self.loss_history_train = []
+        self.accuracy_history_train = []
+        self.loss_history_valid = []
+        self.accuracy_history_valid = []
         self.weights = []
         self.bias = []
     
@@ -89,9 +91,36 @@ class MLP():
         activations, _ = self.forward(X);
         return np.argmax(activations[-1], axis=1);
 
-    def train(self, X, Y):
+    def validate(self, X, Y):
+        n_sample = X.shape[0]
+        correct = 0
+        total = 0
+        epoch_loss = 0;
+        for start in range(0, n_sample, self.batch_size):
+                
+            end = start + self.batch_size
+            X_batched = X[start:end]
+            Y_batched = Y[start:end]
+            
+            activations, _ = self.forward(X_batched)
+
+            y_pred = np.argmax(activations[-1], axis=1)
+            y_true = np.argmax(Y_batched, axis=1)
+            correct += np.sum(y_pred == y_true); 
+            total += len(Y_batched)
+    
+            epoch_loss += self.compute_cross_entropy_loss(Y_batched, activations[-1])
+        average_loss = epoch_loss / n_sample
+        self.loss_history_valid.append(average_loss)
+
+        accuracy = correct / total;
+        self.accuracy_history_valid.append(accuracy);
+        
+
+    def train(self, X, Y, X_valid, Y_valid):
         self.initiaze_parms();
         X = self.normalize(X);
+        X_valid = self.normalize(X_valid)
         n_sample = X.shape[0]
         for epoch in range(self.epochs):
             correct = 0
@@ -113,12 +142,13 @@ class MLP():
                 
                 total += len(Y_batched)
                 epoch_loss += self.compute_cross_entropy_loss(Y_batched, activations[-1])
-            
             average_loss = epoch_loss / n_sample
-            self.loss_history.append(average_loss)
+            self.loss_history_train.append(average_loss)
             
             accuracy = correct / total;
-            self.accuracy_history.append(accuracy);
+            self.accuracy_history_train.append(accuracy);
+            
+            self.validate(X_valid, Y_valid);
 
             if (epoch % 100  == 0):
                 print(f"Epoch: {epoch}, loss: {average_loss}, accuracy: {accuracy}")

@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 from Model import MLP
-from helpers import process_dataset
+from helpers import process_dataset, plot_training_history
 import matplotlib.pyplot as plt
 
 
@@ -25,23 +25,10 @@ if __name__ == "__main__":
     args = parse_args()
 
     X, y = process_dataset('data/train.csv')
+    X_valid, y_valid = process_dataset('data/valid.csv')
     
     model = MLP();
-    model.train(X, y);
-
-    loss_history = model.loss_history
-    acurracy_history = model.accuracy_history
+    model.train(X, y, X_valid, y_valid);
+    plot_training_history(model);
     
-    x_loss = list(range(len(loss_history)))
-    x_accur = list(range(len(acurracy_history)))
-    
-    plt.figure()
-    plt.plot(x_loss, loss_history)
-    plt.legend()
-    
-    plt.figure()
-    plt.plot(x_accur, acurracy_history)
-    plt.legend()
-    
-    plt.show()
     
