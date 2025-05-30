@@ -85,70 +85,55 @@ class MLP():
                 A = self.softmax(Z)
             activations.append(A)
         return activations, pre_activations
-    
-    def predict(self, X):
-        X = self.normalize(X);
-        activations, _ = self.forward(X);
-        return np.argmax(activations[-1], axis=1);
 
-    def validate(self, X, Y):
-        n_sample = X.shape[0]
+    def run_epoch(self, n_sample, X, Y, isTraining):
         correct = 0
         total = 0
-        epoch_loss = 0;
+        epoch_loss = 0
         for start in range(0, n_sample, self.batch_size):
-                
+            
             end = start + self.batch_size
             X_batched = X[start:end]
             Y_batched = Y[start:end]
+            activations, pre_activations = self.forward(X_batched)
             
-            activations, _ = self.forward(X_batched)
-
+            if isTraining == True:
+                self.back_propagation(activations, pre_activations, Y_batched);
+            
             y_pred = np.argmax(activations[-1], axis=1)
             y_true = np.argmax(Y_batched, axis=1)
-            correct += np.sum(y_pred == y_true); 
+            correct += np.sum(y_pred == y_true);
+            
             total += len(Y_batched)
-    
             epoch_loss += self.compute_cross_entropy_loss(Y_batched, activations[-1])
-        average_loss = epoch_loss / n_sample
-        self.loss_history_valid.append(average_loss)
-
+        average_loss = epoch_loss / n_sample;
         accuracy = correct / total;
-        self.accuracy_history_valid.append(accuracy);
         
+        return average_loss, accuracy;
+        
+    def predict(self, X):
+        X = self.normalize(X);
+        activations, _ = self.forward(X);
+        return np.argmax(activations[-1], axis=1);        
 
     def train(self, X, Y, X_valid, Y_valid):
         self.initiaze_parms();
         X = self.normalize(X);
         X_valid = self.normalize(X_valid)
-        n_sample = X.shape[0]
+        n_sample_train = X.shape[0]
+        n_sample_valid = X_valid.shape[0]
         for epoch in range(self.epochs):
-            correct = 0
-            total = 0
-            epoch_loss = 0
-            for start in range(0, n_sample, self.batch_size):
-                
-                end = start + self.batch_size
-                X_batched = X[start:end]
-                Y_batched = Y[start:end]
+            train_average_loss, train_accuracy = self.run_epoch(n_sample_train, X, Y, True)
+            self.accuracy_history_train.append(train_accuracy)
+            self.loss_history_train.append(train_average_loss)
 
-                activations, pre_activations = self.forward(X_batched)
-                
-                self.back_propagation(activations, pre_activations, Y_batched);
-                
-                y_pred = np.argmax(activations[-1], axis=1)
-                y_true = np.argmax(Y_batched, axis=1)
-                correct += np.sum(y_pred == y_true);
-                
-                total += len(Y_batched)
-                epoch_loss += self.compute_cross_entropy_loss(Y_batched, activations[-1])
-            average_loss = epoch_loss / n_sample
-            self.loss_history_train.append(average_loss)
-            
-            accuracy = correct / total;
-            self.accuracy_history_train.append(accuracy);
-            
-            self.validate(X_valid, Y_valid);
+            valid_average_loss, valid_accuracy = self.run_epoch(n_sample_valid, X_valid, Y_valid, False)
+            self.accuracy_history_valid.append(valid_accuracy)
+            self.loss_history_valid.append(valid_average_loss)
 
-            if (epoch % 100  == 0):
-                print(f"Epoch: {epoch}, loss: {average_loss}, accuracy: {accuracy}")
+            if epoch % 100 == 0:
+                print(
+                    f"Epoch: {epoch}, "
+                    f"Train Loss: {train_average_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, "
+                    f"Validation Loss: {valid_average_loss:.4f}, Validation Accuracy: {valid_accuracy:.4f}"
+                )
