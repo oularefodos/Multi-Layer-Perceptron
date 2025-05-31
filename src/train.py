@@ -51,6 +51,9 @@ if __name__ == "__main__":
     
     model = MLP(layers_size=layers_size, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size);
     model.train(X, y, X_valid, y_valid);
+    
+    model.save("model/breast_cancer_mlp.pkl")
+    
     plot_training_history(model);
     
     

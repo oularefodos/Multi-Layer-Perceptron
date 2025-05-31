@@ -25,7 +25,7 @@ train:
 # 	$(PYTHON) predict.py --model saved_model.npy --data data_validation.csv
 
 clean:
-	rm -rf src/__pycache__ *.pyc saved_model.npy data/train.csv data/valid.csv $(VENV)
+	rm -rf src/__pycache__ *.pyc saved_model.npy data/train.csv data/valid.csv model $(VENV)
 
 help:
 	@echo "Available targets:"

@@ -1,4 +1,6 @@
 import numpy as np
+import pickle
+import os
 
 def softmax(Z):
     exp_x = np.exp(Z - np.max(Z))
@@ -8,7 +10,7 @@ def sigmoid(Z):
     return 1 / (1 + np.exp(-Z))
 
 def ReLU(Z):
-    return np.max(0, Z);
+    return np.maximum(0, Z)
 
 def apply_activation(name, Z):
     if name == "softmax":
@@ -148,3 +150,20 @@ class MLP():
                     f"Train Loss: {train_average_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, "
                     f"Validation Loss: {valid_average_loss:.4f}, Validation Accuracy: {valid_accuracy:.4f}"
                 )
+    def save(self, filepath):
+        # Ensure parent directory exists:
+        directory = os.path.dirname(filepath)
+        if directory and not os.path.isdir(directory):
+            os.makedirs(directory, exist_ok=True)
+
+        with open(filepath, "wb") as f:
+            pickle.dump(self, f)
+        print(f"Model saved to: {filepath}")
+    
+    @staticmethod
+    def load_model(filepath):
+        with open(filepath, 'rb') as f:
+            loaded_model = pickle.load(f)
+        print(f"Model loaded from: {filepath}")
+        return loaded_model
+
