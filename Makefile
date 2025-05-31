@@ -18,14 +18,14 @@ split:
 
 train:
 	. $(VENV)/bin/activate && \
-	$(PYTHON) src/train.py --layers 24 24 24 --epochs 84  --batch_size 8 --learning_rate 0.0314
+	$(PYTHON) src/train.py --layers 15 8  --epochs 150 --activations sigmoid sigmoid  --batch_size 16 --learning_rate 0.03
 
 # predict:
 # 	. $(VENV)/bin/activate && \
 # 	$(PYTHON) predict.py --model saved_model.npy --data data_validation.csv
 
-# clean:
-# 	rm -rf src/__pycache__ *.pyc saved_model.npy *.log $(VENV)
+clean:
+	rm -rf src/__pycache__ *.pyc saved_model.npy data/train.csv data/valid.csv $(VENV)
 
 help:
 	@echo "Available targets:"

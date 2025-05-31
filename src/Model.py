@@ -1,10 +1,31 @@
 import numpy as np
 
+def softmax(Z):
+    exp_x = np.exp(Z - np.max(Z))
+    return exp_x / exp_x.sum(axis=1, keepdims=True)
+
+def sigmoid(Z):
+    return 1 / (1 + np.exp(-Z))
+
+def ReLU(Z):
+    return np.max(0, Z);
+
+def apply_activation(name, Z):
+    if name == "softmax":
+        return softmax(Z)
+    elif name == "sigmoid":
+        return sigmoid(Z)
+    elif name == "relu":
+        return ReLU(Z)
+    else:
+        raise ValueError(f"There is no such activation function: '{name}'")
+
 class MLP():
-    def __init__(self, layers_size=[30, 24, 24, 2], epochs=800, learning_rate=0.01, batch_size=4):
+    def __init__(self, layers_size=[30, 24, 24, 2], epochs=800, activations=["sigmoid", "sigmoid"], learning_rate=0.01, batch_size=4):
         self.layers_size = layers_size;
         self.epochs = epochs;
         self.learning_rate = learning_rate;
+        self.activations = activations;
         self.batch_size = batch_size;
         self.loss_history_train = []
         self.accuracy_history_train = []
@@ -12,20 +33,10 @@ class MLP():
         self.accuracy_history_valid = []
         self.weights = []
         self.bias = []
-    
-    def ReLU(self, Z):
-        return np.maximum(0, Z)
-
-    def softmax(self, Z):
-        exp_x = np.exp(Z - np.max(Z))
-        return exp_x / exp_x.sum(axis=1, keepdims=True)
 
     def xavier_init(self, n_in, n_out):
         limit = np.sqrt(6 / (n_in + n_out))
         return np.random.uniform(-limit, limit, (n_in, n_out))
-    
-    def sigmoid(self, Z):
-        return 1 / (1 + np.exp(-Z))
     
     def bias_initializer(self, n_output):
         return np.zeros((1, n_output))
@@ -80,9 +91,9 @@ class MLP():
             Z = np.dot(A, self.weights[i]) + self.bias[i]
             pre_activations.append(Z)
             if i < len(self.weights) - 1:
-                A = self.sigmoid(Z)
+                A = apply_activation(self.activations[i], Z)
             else:
-                A = self.softmax(Z)
+                A = apply_activation("softmax", Z)
             activations.append(A)
         return activations, pre_activations
 
@@ -131,7 +142,7 @@ class MLP():
             self.accuracy_history_valid.append(valid_accuracy)
             self.loss_history_valid.append(valid_average_loss)
 
-            if epoch % 100 == 0:
+            if epoch % 10 == 0:
                 print(
                     f"Epoch: {epoch}, "
                     f"Train Loss: {train_average_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, "
