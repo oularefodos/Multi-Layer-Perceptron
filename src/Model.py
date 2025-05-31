@@ -125,9 +125,12 @@ class MLP():
         return average_loss, accuracy;
         
     def predict(self, X):
-        X = self.normalize(X);
-        activations, _ = self.forward(X);
-        return np.argmax(activations[-1], axis=1);        
+        X = self.normalize(X)
+        activations, _ = self.forward(X)
+        predictions = np.argmax(activations[-1], axis=1)
+        
+        label_map = {0: 'M', 1: 'B'}  # Map index to label
+        return np.array([label_map[p] for p in predictions])
 
     def train(self, X, Y, X_valid, Y_valid):
         self.initiaze_parms();

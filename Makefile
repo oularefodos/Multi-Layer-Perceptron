@@ -20,12 +20,12 @@ train:
 	. $(VENV)/bin/activate && \
 	$(PYTHON) src/train.py --layers 15 8  --epochs 150 --activations sigmoid sigmoid  --batch_size 16 --learning_rate 0.03
 
-# predict:
-# 	. $(VENV)/bin/activate && \
-# 	$(PYTHON) predict.py --model saved_model.npy --data data_validation.csv
+predict:
+	. $(VENV)/bin/activate && \
+	$(PYTHON) src/predict.py --model model/breast_cancer_mlp.pkl --data data/valid.csv
 
 clean:
-	rm -rf src/__pycache__ *.pyc saved_model.npy data/train.csv data/valid.csv model $(VENV)
+	rm -rf src/__pycache__ *.pyc  data/train.csv data/valid.csv model $(VENV)
 
 help:
 	@echo "Available targets:"
