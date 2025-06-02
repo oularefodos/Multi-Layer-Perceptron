@@ -21,8 +21,9 @@ Trained on the **Wisconsin Breast Cancer Dataset** to classify tumors as benign/
 ---
 
 ## 🛠️ Dependencies
-- Python 3.x
-- NumPy (`pip install numpy`)
-- Matplotlib (`pip install matplotlib`) *(for visualizations)*
-- Pandas (`pip install pandas`) *(for data handling)*
----
+- make install	Install dependencies
+- make split	Preprocess and split dataset
+- make train	Train model with default args
+- make predict	Run predictions on test data
+- make clean	Delete generated files (models, plots)
+- make all	Run full pipeline: install → data → train
